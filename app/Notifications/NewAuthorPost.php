@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Notifications;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+
+class NewAuthorPost extends Notification
+{
+    use Queueable;
+    public $post;
+    
+    public function __construct($post)
+    {
+        $this->post=$post;
+    }
+
+    public function via($notifiable)
+    {
+        return ['mail'];
+    }
+
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->greeting('Hello, Admin!')
+            ->subject('New post approval needed')
+            ->line('New post by ' .$this->post->user->name. ' need to approve.')
+            ->line('To approve the post click view button')
+            ->line('Post Title: '.$this->post->title)
+            ->action('View', url(route('admin.post.show',$this->post->id)))
+            ->line('Thank you for using our service!');
+    }
+
+    public function toArray($notifiable)
+    {
+        return [
+            //
+        ];
+    }
+}
